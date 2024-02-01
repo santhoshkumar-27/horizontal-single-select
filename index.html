@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        .scrollable-list {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .list-item {
+            padding: 10px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .list-item.active {
+            background-color: #3498db;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="scrollable-list" id="scrollableList">
+        <div class="list-item" onclick="selectItem(this)">Item 1</div>
+        <div class="list-item" onclick="selectItem(this)">Item 2</div>
+        <div class="list-item" onclick="selectItem(this)">Item 3</div>
+        <div class="list-item" onclick="selectItem(this)">Item 4</div>
+        <div class="list-item" onclick="selectItem(this)">Item 5</div>
+        <div class="list-item" onclick="selectItem(this)">Item 6</div>
+        <div class="list-item" onclick="selectItem(this)">Item 7</div>
+        <div class="list-item" onclick="selectItem(this)">Item 8</div>
+        <div class="list-item" onclick="selectItem(this)">Item 9</div>
+        <div class="list-item" onclick="selectItem(this)">Item 10</div>
+        <div class="list-item" onclick="selectItem(this)">Item 11</div>
+    </div>
+
+    <script>
+        function selectItem(item) {
+            var items = document.querySelectorAll('.list-item');
+            var container = document.getElementById('scrollableList');
+            var containerWidth = container.offsetWidth;
+
+            // Remove the 'active' class from all items
+            items.forEach(function (el) {
+                el.classList.remove('active');
+            });
+
+            // Add the 'active' class to the selected item
+            item.classList.add('active');
+
+            // Check if the selected item is outside the visible range
+            var itemRect = item.getBoundingClientRect();
+            var containerRect = container.getBoundingClientRect();
+
+            if (
+                itemRect.left < containerRect.left ||
+                itemRect.right > containerRect.right
+            ) {
+                // Scroll to the selected item
+                container.scroll({
+                    left: item.offsetLeft - (containerWidth - item.offsetWidth) / 2,
+                    behavior: 'smooth',
+                });
+            }
+
+            // Update the URL query parameter with the selected item index or ID
+            var selectedIndex = Array.from(items).indexOf(item);
+            var queryParams = new URLSearchParams(window.location.search);
+            queryParams.set('selectedItem', selectedIndex);
+            history.pushState({}, '', '?' + queryParams.toString());
+        }
+
+        // On page load, check if there's a selected item in the URL and scroll to it
+        window.addEventListener('load', function () {
+            var queryParams = new URLSearchParams(window.location.search);
+            var selectedIndex = queryParams.get('selectedItem');
+            if (selectedIndex !== null) {
+                var items = document.querySelectorAll('.list-item');
+                var selectedItem = items[selectedIndex];
+                selectItem(selectedItem);
+            }
+        });
+    </script>
+</body>
+
+</html>
